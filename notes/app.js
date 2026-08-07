@@ -121,7 +121,7 @@
       '<span class="chip" style="background:' + esc(a.color || "#C9A000") + '"></span>' +
       '<span class="quote" style="border-left-color:' + esc(a.color || "#C9A000") + '">' + esc(quote || "(no selected text)") + "</span>" +
       "</div>" +
-      '<div class="note-body"><div class="note-text">' + esc(noteText || '<span style="color:#8b949e">No note text.</span>') + "</div></div>" +
+      '<div class="note-body"><div class="note-text">' + (noteText ? AnnotatorMarkdown.mdToHtml(noteText) : '<span style="color:#8b949e">No note text.</span>') + "</div></div>" +
       '<div class="imgs"></div>' +
       '<div class="meta">Added ' + fmtDate(a.createdAt) + "</div>" +
       '<div class="actions">' +
@@ -157,13 +157,35 @@
       if (el.querySelector(".note-body textarea")) return;
       const body = el.querySelector(".note-body");
       body.innerHTML =
+        '<div class="md-tabs">' +
+        '<button type="button" data-md="write" class="on">Write</button>' +
+        '<button type="button" data-md="split">Split</button>' +
+        '<button type="button" data-md="preview">Preview</button>' +
+        "</div>" +
+        '<div class="md-edit" data-mode="write">' +
         '<textarea data-edit="text">' + esc(noteText) + "</textarea>" +
+        '<div class="md-preview"></div>' +
+        "</div>" +
         '<div class="actions" style="margin-top:8px">' +
         '<button class="btn primary" data-act="save">Save</button>' +
         '<button class="btn" data-act="edit-cancel">Cancel</button>' +
         "</div>";
+      const ta = body.querySelector("textarea");
+      const preview = body.querySelector(".md-preview");
+      const update = () => {
+        preview.innerHTML = '<div class="note-text">' + AnnotatorMarkdown.mdToHtml(ta.value) + "</div>";
+      };
+      update();
+      body.querySelectorAll(".md-tabs button").forEach((b) => {
+        b.addEventListener("click", () => {
+          body.querySelector(".md-edit").dataset.mode = b.dataset.md;
+          body.querySelectorAll(".md-tabs button").forEach((x) => x.classList.toggle("on", x === b));
+          update();
+        });
+      });
+      ta.addEventListener("input", update);
       body.querySelector("[data-act='save']").addEventListener("click", async () => {
-        const newText = body.querySelector("textarea").value.trim();
+        const newText = ta.value.trim();
         await AnnotatorStore.update(a.id, { note: { text: newText, images: (a.note && a.note.images) || [] } });
         all = await AnnotatorStore.all();
         renderNotes();
@@ -216,6 +238,52 @@
 
   urlSearch.addEventListener("input", renderUrls);
   noteSearch.addEventListener("input", renderNotes);
+
+  async function exportJson() {
+    const anns = await AnnotatorStore.all();
+    const payload = {
+      app: "chrome-annotator",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      annotations: anns,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "annotator-export-" + new Date().toISOString().slice(0, 10) + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function importJson(e) {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      const arr = Array.isArray(data) ? data : Array.isArray(data.annotations) ? data.annotations : [];
+      const cleaned = arr.filter((x) => x && x.id && x.url && x.range && typeof x.range.content === "string");
+      if (!cleaned.length) {
+        window.alert("No valid annotations found in that file.");
+        return;
+      }
+      await AnnotatorStore.replace(cleaned);
+      all = await AnnotatorStore.all();
+      selectedUrl = (groupByUrl(all)[0] || {}).url || null;
+      renderUrls();
+      renderNotes();
+      window.alert("Imported " + cleaned.length + " annotations.");
+    } catch (err) {
+      window.alert("Import failed: " + err.message);
+    }
+  }
+
+  $("export").addEventListener("click", exportJson);
+  $("import").addEventListener("click", () => $("import-file").click());
+  $("import-file").addEventListener("change", importJson);
 
   (async function init() {
     all = await AnnotatorStore.all();

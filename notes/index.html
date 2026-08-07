@@ -10,6 +10,10 @@
   <header class="topbar">
     <h1>Annotator</h1>
     <span id="total-count" class="count"></span>
+    <span class="spacer"></span>
+    <button id="export" class="btn bar" type="button">Export</button>
+    <button id="import" class="btn bar" type="button">Import</button>
+    <input type="file" id="import-file" accept="application/json,.json" style="display:none" />
   </header>
 
   <main class="layout">
@@ -27,6 +31,7 @@
   </main>
 
   <script src="../lib/storage.js"></script>
+  <script src="../lib/markdown.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

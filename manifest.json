@@ -21,6 +21,7 @@
       "js": [
         "lib/storage.js",
         "lib/ranges.js",
+        "lib/markdown.js",
         "content/note-panel.js",
         "content/content.js"
       ],

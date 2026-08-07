@@ -69,6 +69,34 @@ self.AnnotatorPanel = (() => {
       box-sizing: border-box;
     }
     .hly-text:focus { outline: 2px solid #C9A000; border-color: transparent; }
+    .hly-md-tabs { display: flex; gap: 4px; margin-bottom: 6px; }
+    .hly-md-tabs button {
+      background: transparent; border: 1px solid transparent; border-radius: 6px;
+      padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12px; color: #57606a;
+    }
+    .hly-md-tabs button.on { background: #fff3c4; border-color: #d6c66a; color: #1f2328; font-weight: 600; }
+    .hly-md-edit { display: flex; flex-direction: column; gap: 6px; }
+    .hly-md-edit[data-mode="split"] { flex-direction: row; }
+    .hly-md-edit[data-mode="write"] .hly-md-preview { display: none; }
+    .hly-md-edit[data-mode="preview"] .hly-text { display: none; }
+    .hly-md-edit[data-mode="split"] .hly-text,
+    .hly-md-edit[data-mode="split"] .hly-md-preview { width: 50%; }
+    .hly-md-preview {
+      border: 1px solid #d0d7de; border-radius: 6px; padding: 8px;
+      min-height: 64px; max-height: 180px; overflow: auto;
+      background: #fafbfc; color: #1f2328;
+    }
+    .hly-note h1,.hly-note h2,.hly-note h3,.hly-note h4,.hly-note h5,.hly-note h6 { margin: .4em 0 .2em; line-height: 1.25; }
+    .hly-note h1 { font-size: 1.3em; } .hly-note h2 { font-size: 1.2em; } .hly-note h3 { font-size: 1.1em; }
+    .hly-note p { margin: .3em 0; }
+    .hly-note ul, .hly-note ol { margin: .3em 0; padding-left: 1.3em; }
+    .hly-note li { margin: .1em 0; }
+    .hly-note blockquote { margin: .4em 0; padding: 0 .7em; border-left: 3px solid #d0d7de; color: #57606a; }
+    .hly-note pre { background: #f0f4f8; border-radius: 6px; padding: 8px; overflow: auto; }
+    .hly-note code { background: #f0f4f8; border-radius: 4px; padding: 0 .2em; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9em; }
+    .hly-note pre code { background: transparent; padding: 0; }
+    .hly-note img { max-width: 100%; border-radius: 6px; }
+    .hly-note hr { border: none; border-top: 1px solid #d0d7de; margin: .6em 0; }
     .hly-images { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
     .hly-thumb { position: relative; width: 56px; height: 56px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(0,0,0,.1); }
     .hly-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -97,6 +125,15 @@ self.AnnotatorPanel = (() => {
       pointer-events: none;
     }
     .hly-preview img { display: block; max-width: 420px; max-height: 460px; border-radius: 5px; }
+    .hly-peek {
+      position: fixed; top: 0; left: 0; z-index: 2147483646;
+      width: 300px; max-width: calc(100vw - 24px);
+      background: #fff; border: 1px solid rgba(0,0,0,.14); border-radius: 8px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.28); padding: 10px;
+      pointer-events: none; max-height: 60vh; overflow: auto;
+      font-size: 13px; color: #1f2328;
+    }
+    .hly-peek img.peek-img { max-width: 100%; border-radius: 6px; margin-top: 6px; display: block; }
     .hly-lightbox {
       position: fixed; inset: 0; z-index: 2147483647;
       background: rgba(0, 0, 0, .8);
@@ -144,7 +181,15 @@ self.AnnotatorPanel = (() => {
     panel.innerHTML = `
       <div class="hly-head">New annotation</div>
       <div class="hly-colors"></div>
-      <textarea class="hly-text" placeholder="Add a note…"></textarea>
+      <div class="hly-md-tabs">
+        <button type="button" data-md="write" class="on">Write</button>
+        <button type="button" data-md="split">Split</button>
+        <button type="button" data-md="preview">Preview</button>
+      </div>
+      <div class="hly-md-edit" data-mode="write">
+        <textarea class="hly-text" placeholder="Write a note in Markdown…"></textarea>
+        <div class="hly-md-preview"></div>
+      </div>
       <div class="hly-images"></div>
       <button type="button" class="hly-add">+ Add image</button>
       <input type="file" accept="image/*" multiple class="hly-file" style="display:none">
@@ -159,6 +204,8 @@ self.AnnotatorPanel = (() => {
     els.panel = panel;
     els.colors = panel.querySelector(".hly-colors");
     els.text = panel.querySelector(".hly-text");
+    els.mdEdit = panel.querySelector(".hly-md-edit");
+    els.mdPreview = panel.querySelector(".hly-md-preview");
     els.images = panel.querySelector(".hly-images");
     els.add = panel.querySelector(".hly-add");
     els.file = panel.querySelector(".hly-file");
@@ -175,12 +222,24 @@ self.AnnotatorPanel = (() => {
     els.delete.addEventListener("click", deleteCurrent);
     els.save.addEventListener("click", save);
 
+    panel.querySelectorAll(".hly-md-tabs button").forEach((b) => {
+      b.addEventListener("click", () => selectMode(b.dataset.md));
+    });
+    els.text.addEventListener("input", updateMdPreview);
+
     // Hover preview (lightbox-style overlay) for note images.
     const preview = document.createElement("div");
     preview.className = "hly-preview hidden";
     preview.appendChild(document.createElement("img"));
     host.appendChild(preview);
     els.preview = preview;
+
+    // Hover-to-peek tooltip for reapplied highlights.
+    const peek = document.createElement("div");
+    peek.className = "hly-peek hidden";
+    peek.innerHTML = '<div class="hly-note"></div>';
+    host.appendChild(peek);
+    els.peek = peek;
 
     // Fullscreen click-to-zoom lightbox.
     const lightbox = document.createElement("div");
@@ -194,6 +253,18 @@ self.AnnotatorPanel = (() => {
     });
 
     document.documentElement.appendChild(shadowEl);
+  }
+
+  function selectMode(mode) {
+    els.mdEdit.dataset.mode = mode;
+    host.querySelectorAll(".hly-md-tabs button").forEach((b) => {
+      b.classList.toggle("on", b.dataset.md === mode);
+    });
+    updateMdPreview();
+  }
+
+  function updateMdPreview() {
+    els.mdPreview.innerHTML = '<div class="hly-note">' + AnnotatorMarkdown.mdToHtml(els.text.value) + "</div>";
   }
 
   function openLightbox(data) {
@@ -325,6 +396,9 @@ self.AnnotatorPanel = (() => {
     selectColor(DEFAULT_COLOR);
     renderImages();
     setStatus("");
+    hidePeek();
+    selectMode("write");
+    updateMdPreview();
     position(rect);
     els.text.focus();
   }
@@ -345,9 +419,43 @@ self.AnnotatorPanel = (() => {
         selectColor(color);
         renderImages();
         setStatus("");
+        hidePeek();
+        selectMode("write");
+        updateMdPreview();
         position(rect);
       })
       .catch(() => setStatus("Could not load annotation."));
+  }
+
+  function showPeek(id, rect) {
+    AnnotatorStore.all()
+      .then((list) => {
+        const ann = list.find((a) => a.id === id);
+        if (!ann) return;
+        const noteText = (ann.note && ann.note.text) || "";
+        const imgs = (ann.note && ann.note.images) || [];
+        let html = noteText
+          ? '<div class="hly-note">' + AnnotatorMarkdown.mdToHtml(noteText) + "</div>"
+          : '<div class="hly-note"><p style="color:#8b949e">No note text.</p></div>';
+        if (imgs.length) html += imgs.map((s) => '<img class="peek-img" src="' + s + '">').join("");
+        els.peek.innerHTML = html;
+        els.peek.classList.remove("hidden");
+        const b = els.peek.getBoundingClientRect();
+        const pad = 6;
+        let x = rect.right + pad;
+        let y = rect.top;
+        if (x + b.width > innerWidth - pad) x = rect.left - b.width - pad;
+        if (x < pad) x = pad;
+        if (y + b.height > innerHeight - pad) y = Math.max(pad, innerHeight - b.height - pad);
+        if (y < pad) y = pad;
+        els.peek.style.left = x + "px";
+        els.peek.style.top = y + "px";
+      })
+      .catch(() => {});
+  }
+
+  function hidePeek() {
+    if (els.peek) els.peek.classList.add("hidden");
   }
 
   function elById(id) {
@@ -402,6 +510,7 @@ self.AnnotatorPanel = (() => {
     els.status.textContent = "";
     hidePreview();
     closeLightbox();
+    hidePeek();
     currentId = null;
     pendingRange = null;
   }
@@ -433,6 +542,8 @@ self.AnnotatorPanel = (() => {
     showAnnotateButton,
     hideAnnotateButton,
     openForRange,
+    showPeek,
+    hidePeek,
     openForId,
     close,
     isOpen() {

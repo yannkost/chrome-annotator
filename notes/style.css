@@ -14,18 +14,12 @@ body {
   overflow: hidden;
 }
 
-.topbar {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 12px 20px;
-  background: #1f2328;
-  color: #fff;
-}
-
+.topbar { display: flex; align-items: baseline; gap: 12px; padding: 12px 20px; background: #1f2328; color: #fff; }
 .topbar h1 { margin: 0; font-size: 18px; }
-
+.spacer { flex: 1; }
 .count { color: #c9d1d9; font-size: 13px; }
+.btn.bar { border-color: rgba(255,255,255,.3); color: #fff; }
+.btn.bar:hover { background: rgba(255,255,255,.1); }
 
 .layout {
   flex: 1;
@@ -148,6 +142,36 @@ body {
 .card textarea {
   width: 100%; min-height: 60px; resize: vertical;
   border: 1px solid #d0d7de; border-radius: 6px; padding: 8px; font: inherit;
+}
+
+/* Rendered markdown inside a card */
+.note-text h1, .note-text h2, .note-text h3, .note-text h4 { margin: .4em 0 .2em; line-height: 1.25; }
+.note-text h1 { font-size: 1.3em; } .note-text h2 { font-size: 1.2em; } .note-text h3 { font-size: 1.1em; }
+.note-text p { margin: .3em 0; }
+.note-text ul, .note-text ol { margin: .3em 0; padding-left: 1.3em; }
+.note-text blockquote { margin: .4em 0; padding: 0 .7em; border-left: 3px solid #d0d7de; color: #57606a; }
+.note-text pre { background: #f0f4f8; border-radius: 6px; padding: 8px; overflow: auto; }
+.note-text code { background: #f0f4f8; border-radius: 4px; padding: 0 .2em; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9em; }
+.note-text pre code { background: transparent; padding: 0; }
+.note-text img { max-width: 100%; border-radius: 6px; }
+.note-text hr { border: none; border-top: 1px solid #d0d7de; margin: .6em 0; }
+
+/* Markdown editor in edit mode */
+.md-tabs { display: flex; gap: 4px; margin-bottom: 6px; }
+.md-tabs button {
+  background: transparent; border: 1px solid transparent; border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12px; color: #57606a;
+}
+.md-tabs button.on { background: #fff3c4; border-color: #d6c66a; color: #1f2328; font-weight: 600; }
+.md-edit { display: flex; flex-direction: column; gap: 6px; }
+.md-edit[data-mode="split"] { flex-direction: row; }
+.md-edit[data-mode="write"] .md-preview { display: none; }
+.md-edit[data-mode="preview"] textarea { display: none; }
+.md-edit[data-mode="split"] textarea, .md-edit[data-mode="split"] .md-preview { width: 50%; }
+.md-preview {
+  border: 1px solid #d0d7de; border-radius: 6px; padding: 8px;
+  min-height: 60px; max-height: 200px; overflow: auto;
+  background: #fafbfc; color: #1f2328;
 }
 
 .empty {

@@ -113,6 +113,19 @@
     AnnotatorPanel.openForId(el.dataset.hlyId, el.getBoundingClientRect());
   });
 
+  // Hover a highlight to peek its note without opening the panel.
+  document.addEventListener("mouseover", (e) => {
+    const m = e.target.closest(".hly-marker");
+    if (m && m.dataset.hlyId) AnnotatorPanel.showPeek(m.dataset.hlyId, m.getBoundingClientRect());
+  });
+  document.addEventListener("mouseout", (e) => {
+    const m = e.target.closest(".hly-marker");
+    const rt = e.relatedTarget;
+    if (m && !(rt && rt.closest && rt.closest(".hly-marker") === m)) {
+      AnnotatorPanel.hidePeek();
+    }
+  });
+
   // ---- Re-apply saved highlights for this URL (best-effort + retries) ----
   async function reapplyOnce() {
     let anns = [];
