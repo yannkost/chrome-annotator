@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annotator — All annotations</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Annotator</h1>
+    <span id="total-count" class="count"></span>
+  </header>
+
+  <main class="layout">
+    <aside class="urls-panel">
+      <input id="url-search" class="search" type="search" placeholder="Search sites…" autocomplete="off" />
+      <ul id="url-list" class="url-list"></ul>
+    </aside>
+
+    <section class="notes-panel">
+      <input id="note-search" class="search" type="search" placeholder="Search notes…" autocomplete="off" />
+      <div id="notes-head" class="notes-head hidden"></div>
+      <div id="notes-list" class="notes-list"></div>
+      <div id="empty" class="empty hidden">No annotations yet. Select text on any page and click <strong>Annotate</strong>.</div>
+    </section>
+  </main>
+
+  <script src="../lib/storage.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

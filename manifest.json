@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Annotator",
+  "version": "1.0.0",
+  "description": "Highlight text and attach persistent notes with images.",
+  "permissions": ["storage", "unlimitedStorage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Annotations"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "lib/storage.js",
+        "lib/ranges.js",
+        "content/note-panel.js",
+        "content/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

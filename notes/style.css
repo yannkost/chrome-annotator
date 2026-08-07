@@ -1,0 +1,177 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1f2328;
+  background: #f6f8fa;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 20px;
+  background: #1f2328;
+  color: #fff;
+}
+
+.topbar h1 { margin: 0; font-size: 18px; }
+
+.count { color: #c9d1d9; font-size: 13px; }
+
+.layout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.urls-panel {
+  width: 300px;
+  min-width: 240px;
+  border-right: 1px solid #d0d7de;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.notes-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: #f6f8fa;
+}
+
+.search {
+  margin: 12px;
+  padding: 8px 12px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  font: inherit;
+  flex: 0 0 auto;
+}
+
+.search:focus { outline: 2px solid #c9a000; border-color: transparent; }
+
+.url-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.url-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+.url-item:hover { background: #f0f4f8; }
+.url-item.active { background: #fff3c4; }
+
+.url-item .u-host { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.url-item .u-title { font-size: 12px; color: #57606a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.url-item .u-meta { font-size: 11px; color: #8b949e; margin-top: 2px; }
+
+.notes-head { padding: 8px 16px; font-size: 13px; color: #57606a; font-weight: 600; }
+
+.notes-list { flex: 1; overflow-y: auto; padding: 4px 16px 20px; }
+
+.card {
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.card .row-top { display: flex; align-items: center; gap: 10px; }
+
+.chip {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 1px solid rgba(0,0,0,.15); flex: 0 0 auto;
+}
+
+.card .quote {
+  font-size: 13px;
+  color: #444;
+  background: #fffbea;
+  border-left: 3px solid #c9a000;
+  padding: 6px 8px;
+  border-radius: 0 6px 6px 0;
+  margin: 8px 0;
+  font-style: italic;
+}
+
+.card .note-text {
+  font-size: 14px;
+  margin: 6px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.card .imgs { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.card .imgs img { width: 72px; height: 72px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(0,0,0,.1); cursor: zoom-in; }
+
+.card .meta { font-size: 11px; color: #8b949e; margin-top: 8px; }
+
+.card .actions { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+
+.btn {
+  background: transparent;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  color: #57606a;
+}
+
+.btn:hover { background: #f3f4f6; }
+.btn.danger { border-color: #f9c6c6; color: #cf222e; }
+.btn.danger:hover { background: #ffebe9; }
+.btn.primary { background: #c9a000; border-color: #c9a000; color: #1f2328; font-weight: 600; }
+
+.card textarea {
+  width: 100%; min-height: 60px; resize: vertical;
+  border: 1px solid #d0d7de; border-radius: 6px; padding: 8px; font: inherit;
+}
+
+.empty {
+  text-align: center;
+  color: #8b949e;
+  padding: 60px 20px;
+  font-size: 14px;
+}
+
+.lightbox {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  display: none; align-items: center; justify-content: center; z-index: 10;
+  cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 6px; }
+
+.preview {
+  position: fixed; top: 0; left: 0; z-index: 9;
+  background: #fff; border: 1px solid rgba(0,0,0,.14); border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.3); padding: 4px;
+  pointer-events: none;
+  display: none;
+}
+.preview.open { display: block; }
+.preview img { display: block; max-width: 420px; max-height: 460px; border-radius: 5px; }
