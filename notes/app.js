@@ -164,6 +164,7 @@
         "</div>" +
         '<div class="md-edit" data-mode="write">' +
         '<textarea data-edit="text">' + esc(noteText) + "</textarea>" +
+        '<div class="md-resize" title="Drag to resize"></div>' +
         '<div class="md-preview"></div>' +
         "</div>" +
         '<div class="actions" style="margin-top:8px">' +
@@ -184,6 +185,24 @@
         });
       });
       ta.addEventListener("input", update);
+      body.querySelector(".md-resize").addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        const cont = body.querySelector(".md-edit");
+        const rect = cont.getBoundingClientRect();
+        const startX = e.clientX;
+        const startPct = parseFloat(ta.style.flexBasis) || 50;
+        const move = (ev) => {
+          const pct = Math.min(90, Math.max(10, startPct + ((ev.clientX - startX) / rect.width) * 100));
+          ta.style.flex = "1 1 " + pct + "%";
+          preview.style.flex = "1 1 auto";
+        };
+        const up = () => {
+          document.removeEventListener("mousemove", move);
+          document.removeEventListener("mouseup", up);
+        };
+        document.addEventListener("mousemove", move);
+        document.addEventListener("mouseup", up);
+      });
       body.querySelector("[data-act='save']").addEventListener("click", async () => {
         const newText = ta.value.trim();
         await AnnotatorStore.update(a.id, { note: { text: newText, images: (a.note && a.note.images) || [] } });

@@ -41,12 +41,12 @@ self.AnnotatorPanel = (() => {
     .hly-btn:hover { background: #333; }
     .hly-panel {
       position: fixed; top: 0; left: 0; z-index: 2147483647;
-      width: 320px; max-width: calc(100vw - 16px);
+      width: 620px; max-width: calc(100vw - 16px);
       background: #fff;
       border: 1px solid rgba(0,0,0,.12);
       border-radius: 10px;
       box-shadow: 0 8px 30px rgba(0,0,0,.22);
-      padding: 12px;
+      padding: 14px;
       font-size: 13px;
     }
     .hly-head { font-weight: 700; margin-bottom: 10px; }
@@ -63,28 +63,41 @@ self.AnnotatorPanel = (() => {
       border: 2px dashed rgba(0,0,0,.3); line-height: 18px; text-align: center; color: #555; font-weight: 700;
     }
     .hly-text {
-      width: 100%; min-height: 64px; resize: vertical;
+      width: 100%; min-height: 140px; resize: vertical;
       border: 1px solid #d0d7de; border-radius: 6px;
       padding: 8px; font: inherit; color: #1f2328;
       box-sizing: border-box;
+      flex: 1 1 auto; min-width: 0;
     }
     .hly-text:focus { outline: 2px solid #C9A000; border-color: transparent; }
-    .hly-md-tabs { display: flex; gap: 4px; margin-bottom: 6px; }
-    .hly-md-tabs button {
-      background: transparent; border: 1px solid transparent; border-radius: 6px;
-      padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12px; color: #57606a;
+    .hly-md-tabs {
+      display: flex; margin-bottom: 8px; overflow: hidden;
+      border: 1px solid #aab1b9; border-radius: 8px;
+      background: #d6dbe0; box-shadow: inset 0 1px 2px rgba(0,0,0,.08);
     }
-    .hly-md-tabs button.on { background: #fff3c4; border-color: #d6c66a; color: #1f2328; font-weight: 600; }
-    .hly-md-edit { display: flex; flex-direction: column; gap: 6px; }
-    .hly-md-edit[data-mode="split"] { flex-direction: row; }
+    .hly-md-tabs button {
+      flex: 1; border: none; background: transparent; cursor: pointer;
+      padding: 7px 0; font: inherit; font-size: 12px; color: #4b5257;
+    }
+    .hly-md-tabs button + button { border-left: 1px solid #aab1b9; }
+    .hly-md-tabs button.on { background: #fff; color: #1f2328; font-weight: 600; box-shadow: inset 0 1px 3px rgba(0,0,0,.12); }
+    .hly-md-edit { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+    .hly-md-edit .hly-resize { display: none; }
     .hly-md-edit[data-mode="write"] .hly-md-preview { display: none; }
     .hly-md-edit[data-mode="preview"] .hly-text { display: none; }
-    .hly-md-edit[data-mode="split"] .hly-text,
-    .hly-md-edit[data-mode="split"] .hly-md-preview { width: 50%; }
+    .hly-md-edit[data-mode="split"] { flex-direction: row; border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; }
+    .hly-md-edit[data-mode="split"] .hly-text { border: none; border-radius: 0; width: auto; flex: 1 1 50%; min-width: 0; }
+    .hly-md-edit[data-mode="split"] .hly-md-preview { border: none; border-radius: 0; width: auto; flex: 1 1 50%; min-width: 0; }
+    .hly-md-edit[data-mode="split"] .hly-resize {
+      display: block; flex: 0 0 1px; cursor: col-resize;
+      background: #d0d7de; margin: 0;
+    }
+    .hly-md-edit[data-mode="split"] .hly-resize:hover { background: #C9A000; }
     .hly-md-preview {
-      border: 1px solid #d0d7de; border-radius: 6px; padding: 8px;
-      min-height: 64px; max-height: 180px; overflow: auto;
+      border: 1px solid #d0d7de; border-radius: 6px; padding: 10px;
+      min-height: 140px; max-height: 320px; overflow: auto;
       background: #fafbfc; color: #1f2328;
+      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     .hly-note h1,.hly-note h2,.hly-note h3,.hly-note h4,.hly-note h5,.hly-note h6 { margin: .4em 0 .2em; line-height: 1.25; }
     .hly-note h1 { font-size: 1.3em; } .hly-note h2 { font-size: 1.2em; } .hly-note h3 { font-size: 1.1em; }
@@ -95,7 +108,7 @@ self.AnnotatorPanel = (() => {
     .hly-note pre { background: #f0f4f8; border-radius: 6px; padding: 8px; overflow: auto; }
     .hly-note code { background: #f0f4f8; border-radius: 4px; padding: 0 .2em; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .9em; }
     .hly-note pre code { background: transparent; padding: 0; }
-    .hly-note img { max-width: 100%; border-radius: 6px; }
+    .hly-note img { width: 50px; height: 50px; object-fit: cover; float: left; margin: 2px; border-radius: 6px; }
     .hly-note hr { border: none; border-top: 1px solid #d0d7de; margin: .6em 0; }
     .hly-images { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
     .hly-thumb { position: relative; width: 56px; height: 56px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(0,0,0,.1); }
@@ -108,15 +121,18 @@ self.AnnotatorPanel = (() => {
     .hly-add { background: #f0f4f8; border: 1px dashed #b6c2cf; color: #57606a; border-radius: 6px; padding: 6px 10px; cursor: pointer; font: inherit; }
     .hly-add:hover { background: #e6ecf2; }
     .hly-actions { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+    .hly-actions .hly-spacer { flex: 1; }
     .hly-btn-primary {
-      background: #C9A000; border: none; color: #1f2328;
-      border-radius: 6px; padding: 8px 14px; font-weight: 700; cursor: pointer; font: inherit;
+      background: #4a9eff; border: none; color: #fff;
+      border-radius: 6px; padding: 8px 16px; font-weight: 700; cursor: pointer; font: inherit;
     }
-    .hly-btn-primary:hover { background: #b28f00; }
+    .hly-btn-primary:hover { background: #3a8ae0; }
     .hly-btn-ghost { background: transparent; border: 1px solid #d0d7de; border-radius: 6px; padding: 8px 12px; cursor: pointer; font: inherit; color: #57606a; }
     .hly-btn-ghost:hover { background: #f3f4f6; }
-    .hly-btn-danger { background: transparent; border: 1px solid #f9c6c6; color: #cf222e; border-radius: 6px; padding: 8px 12px; cursor: pointer; font: inherit; margin-left: auto; }
+    .hly-btn-danger { background: transparent; border: 1px solid #f9c6c6; color: #cf222e; border-radius: 6px; padding: 8px 12px; cursor: pointer; font: inherit; }
     .hly-btn-danger:hover { background: #ffebe9; }
+    .hly-confirm { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+    .hly-confirm .message { flex: 1; color: #cf222e; font-weight: 600; }
     .hly-status { color: #cf222e; font-size: 12px; margin-top: 8px; min-height: 0; }
     .hly-preview {
       position: fixed; top: 0; left: 0; z-index: 2147483647;
@@ -124,16 +140,17 @@ self.AnnotatorPanel = (() => {
       box-shadow: 0 8px 30px rgba(0,0,0,.3); padding: 4px;
       pointer-events: none;
     }
-    .hly-preview img { display: block; max-width: 420px; max-height: 460px; border-radius: 5px; }
+    .hly-preview img { display: block; max-width: 80vw; max-height: 80vh; width: auto; height: auto; border-radius: 5px; }
     .hly-peek {
       position: fixed; top: 0; left: 0; z-index: 2147483646;
-      width: 300px; max-width: calc(100vw - 24px);
+      width: max-content; max-width: min(380px, calc(100vw - 24px));
       background: #fff; border: 1px solid rgba(0,0,0,.14); border-radius: 8px;
       box-shadow: 0 8px 30px rgba(0,0,0,.28); padding: 10px;
       pointer-events: none; max-height: 60vh; overflow: auto;
       font-size: 13px; color: #1f2328;
+      font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    .hly-peek img.peek-img { max-width: 100%; border-radius: 6px; margin-top: 6px; display: block; }
+    .hly-peek img.peek-img { width: 50px; height: 50px; object-fit: cover; float: left; margin: 2px; border-radius: 6px; }
     .hly-lightbox {
       position: fixed; inset: 0; z-index: 2147483647;
       background: rgba(0, 0, 0, .8);
@@ -188,15 +205,22 @@ self.AnnotatorPanel = (() => {
       </div>
       <div class="hly-md-edit" data-mode="write">
         <textarea class="hly-text" placeholder="Write a note in Markdown…"></textarea>
+        <div class="hly-resize" title="Drag to resize"></div>
         <div class="hly-md-preview"></div>
       </div>
       <div class="hly-images"></div>
       <button type="button" class="hly-add">+ Add image</button>
       <input type="file" accept="image/*" multiple class="hly-file" style="display:none">
       <div class="hly-actions">
-        <button type="button" class="hly-btn-primary">Save</button>
-        <button type="button" class="hly-btn-ghost">Cancel</button>
         <button type="button" class="hly-btn-danger hidden">Delete</button>
+        <span class="hly-spacer"></span>
+        <button type="button" class="hly-btn-ghost">Cancel</button>
+        <button type="button" class="hly-btn-primary">Save</button>
+      </div>
+      <div class="hly-confirm hidden">
+        <span class="message">Delete this annotation?</span>
+        <button type="button" class="hly-btn-ghost" data-c="no">Cancel</button>
+        <button type="button" class="hly-btn-danger" data-c="yes">Delete</button>
       </div>
       <div class="hly-status"></div>
     `;
@@ -206,6 +230,7 @@ self.AnnotatorPanel = (() => {
     els.text = panel.querySelector(".hly-text");
     els.mdEdit = panel.querySelector(".hly-md-edit");
     els.mdPreview = panel.querySelector(".hly-md-preview");
+    els.resize = panel.querySelector(".hly-resize");
     els.images = panel.querySelector(".hly-images");
     els.add = panel.querySelector(".hly-add");
     els.file = panel.querySelector(".hly-file");
@@ -214,18 +239,44 @@ self.AnnotatorPanel = (() => {
     els.cancel = panel.querySelector(".hly-btn-ghost");
     els.delete = panel.querySelector(".hly-btn-danger");
     els.head = panel.querySelector(".hly-head");
+    els.actions = panel.querySelector(".hly-actions");
+    els.confirm = panel.querySelector(".hly-confirm");
+    els.confirmYes = els.confirm.querySelector('[data-c="yes"]');
+    els.confirmNo = els.confirm.querySelector('[data-c="no"]');
 
     buildSwatches();
     els.add.addEventListener("click", () => els.file.click());
     els.file.addEventListener("change", onFiles);
     els.cancel.addEventListener("click", close);
-    els.delete.addEventListener("click", deleteCurrent);
+    els.delete.addEventListener("click", showConfirm);
+    els.confirmNo.addEventListener("click", hideConfirm);
+    els.confirmYes.addEventListener("click", deleteCurrent);
     els.save.addEventListener("click", save);
 
     panel.querySelectorAll(".hly-md-tabs button").forEach((b) => {
       b.addEventListener("click", () => selectMode(b.dataset.md));
     });
     els.text.addEventListener("input", updateMdPreview);
+
+    // Draggable divider for the Split view (resize the two panes).
+    els.resize.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      const cont = els.mdEdit;
+      const rect = cont.getBoundingClientRect();
+      const startX = e.clientX;
+      const startPct = parseFloat(els.text.style.flexBasis) || 50;
+      const move = (ev) => {
+        const pct = Math.min(90, Math.max(10, startPct + ((ev.clientX - startX) / rect.width) * 100));
+        els.text.style.flex = "1 1 " + pct + "%";
+        els.mdPreview.style.flex = "1 1 auto";
+      };
+      const up = () => {
+        document.removeEventListener("mousemove", move);
+        document.removeEventListener("mouseup", up);
+      };
+      document.addEventListener("mousemove", move);
+      document.addEventListener("mouseup", up);
+    });
 
     // Hover preview (lightbox-style overlay) for note images.
     const preview = document.createElement("div");
@@ -399,6 +450,7 @@ self.AnnotatorPanel = (() => {
     hidePeek();
     selectMode("write");
     updateMdPreview();
+    hideConfirm();
     position(rect);
     els.text.focus();
   }
@@ -422,6 +474,7 @@ self.AnnotatorPanel = (() => {
         hidePeek();
         selectMode("write");
         updateMdPreview();
+        hideConfirm();
         position(rect);
       })
       .catch(() => setStatus("Could not load annotation."));
@@ -497,6 +550,7 @@ self.AnnotatorPanel = (() => {
   }
 
   async function deleteCurrent() {
+    hideConfirm();
     if (!currentId) return;
     const spanEl = elById(currentId);
     if (spanEl) spanEl.remove();
@@ -504,10 +558,21 @@ self.AnnotatorPanel = (() => {
     close();
   }
 
+  function showConfirm() {
+    els.actions.classList.add("hidden");
+    els.confirm.classList.remove("hidden");
+  }
+
+  function hideConfirm() {
+    els.confirm.classList.add("hidden");
+    els.actions.classList.remove("hidden");
+  }
+
   function close() {
     panelOpen = false;
     els.panel.classList.add("hidden");
     els.status.textContent = "";
+    hideConfirm();
     hidePreview();
     closeLightbox();
     hidePeek();
